@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Flash Message -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, msg in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ msg }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+<div class="card shadow">
+
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">👥 User Management</h3>
+  </div>
+
+  <div class="card-body">
+
+    <!-- ADD USER -->
+    <div class="card p-3 mb-4">
+      <form method="POST" action="/add-user" class="row g-2">
+
+        <div class="col-md-5">
+          <input type="text" name="name" class="form-control" placeholder="Enter User Name" required>
+        </div>
+
+        <div class="col-md-4">
+          <select name="role" class="form-control" required>
+            <option value="">Select Role</option>
+            <option value="Admin">Admin</option>
+            <option value="Manager">Manager</option>
+            <option value="User">User</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <button class="btn btn-primary w-100 shadow">Add User</button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- SEARCH -->
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="🔍 Search user...">
+
+    <!-- TABLE -->
+    <table class="table table-hover text-center">
+
+      <thead class="bg-dark text-white">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="userTable">
+
+        {% for u in users %}
+        <tr>
+          <td>{{ u[0] }}</td>
+          <td>{{ u[1] }}</td>
+          <td>
+            <span class="badge bg-info p-2">{{ u[2] }}</span>
+          </td>
+          <td>
+            <!-- DELETE -->
+            <a href="#" class="btn btn-danger btn-sm shadow delete-btn" data-id="{{ u[0] }}">
+              <i class="fas fa-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+</div>
+
+<!-- SEARCH SCRIPT -->
+<script>
+document.getElementById("searchInput").addEventListener("keyup", function() {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll("#userTable tr");
+    
+    rows.forEach(row => {
+        let text = row.textContent.toLowerCase();
+        row.style.display = text.includes(value) ? "" : "none";
+    });
+});
+
+// DELETE WITH CONFIRMATION
+document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        let id = this.dataset.id;
+        if (confirm("Are you sure?")) {
+            window.location.href = `/delete-user/${id}`;
+        }
+    });
+});
+</script>
+
+{% endblock %}
