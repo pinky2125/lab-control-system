@@ -104,7 +104,7 @@
 
           <td>{{ "%.1f%%" % s[7] if s[7] else '-' }}</td>
           <td>{{ "%.1f%%" % s[8] if s[8] else '-' }}</td>
-          <td><small>{{ s[9] if s[9] else '-' }}</small></td>
+          <td><small>{{ s[6] if s[6] else '-' }}</small></td>
 
           <td>
 
@@ -113,6 +113,7 @@
               data-id="{{ s[0] }}"
               data-name="{{ s[1] }}"
               data-ip="{{ s[2] }}"
+              data-mac="{{ s[3] }}"
               data-status="{{ s[4] }}"
               title="Edit System">
               <i class="fas fa-edit"></i>
@@ -172,6 +173,11 @@
           </div>
 
           <div class="mb-3">
+            <label>MAC Address</label>
+            <input type="text" name="mac_address" id="edit-mac" class="form-control">
+          </div>
+
+          <div class="mb-3">
             <label>Status</label>
             <select name="status" id="edit-status" class="form-control">
               <option value="Online">Online</option>
@@ -212,6 +218,7 @@ document.querySelectorAll(".edit-btn").forEach(btn => {
         document.getElementById("edit-id").value = this.dataset.id;
         document.getElementById("edit-name").value = this.dataset.name;
         document.getElementById("edit-ip").value = this.dataset.ip;
+        document.getElementById("edit-mac").value = this.dataset.mac;
         document.getElementById("edit-status").value = this.dataset.status;
         new bootstrap.Modal(document.getElementById("editModal")).show();
     });

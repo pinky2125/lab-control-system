@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+  <div class="card-header">
+    <h3 class="card-title">🚀 Client Deployment</h3>
+  </div>
+
+  <div class="card-body">
+
+    <div class="alert alert-info">
+      <h5><i class="fas fa-info-circle"></i> Client PCs को Connect करने के लिए</h5>
+      <p>नीचे दिए गए options में से कोई एक choose करें। सभी PCs को automatically monitor करने के लिए तैयार कर दिया गया है।</p>
+    </div>
+
+    <!-- Quick Download Section -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h5 class="card-title"><i class="fas fa-download"></i> Quick Download</h5>
+          </div>
+          <div class="card-body">
+            <p>सभी required files एक साथ download करें:</p>
+            <a href="/deploy/download-agent" class="btn btn-primary btn-block">
+              <i class="fas fa-file-archive"></i> Download Agent ZIP
+            </a>
+            <small class="text-muted">ZIP file में सभी setup files होंगे</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card card-success">
+          <div class="card-header">
+            <h5 class="card-title"><i class="fas fa-magic"></i> One-Click Installer</h5>
+          </div>
+          <div class="card-body">
+            <p>Windows के लिए automated installer:</p>
+            <a href="/deploy/get-installer/windows" class="btn btn-success btn-block">
+              <i class="fas fa-windows"></i> Download Windows Installer
+            </a>
+            <small class="text-muted">एक file download करें और run करें</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Setup Instructions -->
+    <div class="card card-warning mt-4">
+      <div class="card-header">
+        <h5 class="card-title"><i class="fas fa-cogs"></i> Manual Setup Instructions</h5>
+      </div>
+      <div class="card-body">
+        <h6>Step 1: System ID Check करें</h6>
+        <p>सबसे पहले Systems page पर जाएं और अपने PC का ID note करें।</p>
+
+        <h6>Step 2: Client PC पर Setup करें</h6>
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Windows:</strong>
+            <pre class="bg-light p-2"><code>pip install psutil requests
+python monitoring_agent.py --system-id YOUR_ID --server http://YOUR_SERVER_IP:5000</code></pre>
+          </div>
+          <div class="col-md-6">
+            <strong>Linux/Mac:</strong>
+            <pre class="bg-light p-2"><code>pip install psutil requests
+python monitoring_agent.py --system-id YOUR_ID --server http://YOUR_SERVER_IP:5000</code></pre>
+          </div>
+        </div>
+
+        <h6>Step 3: Verify Connection</h6>
+        <p>Agent run करने के बाद Systems page पर वापस आएं और status check करें।</p>
+      </div>
+    </div>
+
+    <!-- Network Requirements -->
+    <div class="card card-info mt-4">
+      <div class="card-header">
+        <h5 class="card-title"><i class="fas fa-network-wired"></i> Network Requirements</h5>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>✅ सभी PCs same network में होने चाहिए</li>
+          <li>✅ Port 5000 accessible होना चाहिए</li>
+          <li>✅ Python 3.6+ installed होना चाहिए</li>
+          <li>✅ Internet connection (dependencies install करने के लिए)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Current Systems Status -->
+    <div class="card card-secondary mt-4">
+      <div class="card-header">
+        <h5 class="card-title"><i class="fas fa-chart-line"></i> Current Systems Status</h5>
+      </div>
+      <div class="card-body">
+        <p>Connected systems की list:</p>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Last Check</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for system in systems %}
+              <tr>
+                <td>{{ system[0] }}</td>
+                <td>{{ system[1] }}</td>
+                <td>
+                  {% if system[4] == "Online" %}
+                    <span class="badge badge-success">🟢 Online</span>
+                  {% else %}
+                    <span class="badge badge-secondary">⚪ {{ system[4] or 'Unknown' }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ system[9] or 'Never' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if not systems %}
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i> कोई systems add नहीं किए गए। पहले Systems page पर systems add करें।
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Auto-refresh status every 30 seconds
+setInterval(function() {
+    location.reload();
+}, 30000);
+</script>
+
+{% endblock %}

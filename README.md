@@ -173,34 +173,133 @@ Access at: `http://localhost:5000`
 
 The monitoring agent runs on client PCs and reports system health to the server.
 
-### Installation on Client PC
+### 🌐 Web-Based Deployment (Recommended - No File Copying!)
+
+**Easiest Method - Clients just need a web browser!**
+
+1. Login to Lab Control System
+2. Go to "Deploy Clients" page from sidebar
+3. Choose download option:
+   - **One-Click Installer**: Download single BAT file for Windows
+   - **Agent ZIP**: Download all files as ZIP
+4. Run downloaded file on client PC
+5. Enter System ID and Server IP when prompted
+
+**Web Interface**: `http://your-server:5000/deploy`
+
+### Quick Client Setup
+
+#### For Windows Clients:
+```batch
+# Download and run one-click installer from web interface
+# Or manually:
+pip install psutil requests
+python monitoring_agent.py --system-id 1 --server http://server-ip:5000
+```
+
+#### For Linux/macOS Clients:
+```bash
+pip install psutil requests
+python monitoring_agent.py --system-id 1 --server http://server-ip:5000
+```
+
+### Network Deployment (Advanced)
+
+For IT administrators with network access:
+
+```powershell
+# Run on server with admin credentials
+.\network_deploy.ps1 -ServerIP "192.168.1.100" -ClientIPs "192.168.1.101", "192.168.1.102"
+```
+
+**Requirements:**
+- PowerShell remoting enabled
+- Admin access to client machines
+- Same network/domain
+
+### Manual Installation
 
 ```bash
-# Install psutil
+# Install dependencies
 pip install psutil requests
 
-# Run agent (Linux/macOS)
-python monitoring_agent.py --system-id 1 --server http://lab-server:5000
-
-# Or with custom interval (every 60 seconds)
-python monitoring_agent.py --system-id 1 --server http://lab-server:5000 --interval 60
+# Run agent
+python monitoring_agent.py --system-id 1 --server http://lab-server:5000 --interval 30
 ```
 
 **Parameters:**
-- `--system-id` - The system ID in database (required)
+- `--system-id` - The system ID from database (required)
 - `--server` - Lab Control Server URL (required)
 - `--interval` - Report interval in seconds (default: 30)
 
-### Example: Windows Startup Script
+### Getting System ID
 
-Create `monitoring_agent.bat`:
+1. Login to Lab Control System
+2. Go to Systems page
+3. Note the ID column for your system
+4. Use that ID when running the agent
+
+### Auto-Start on Boot (Windows)
+
+1. Create a batch file `start_monitoring.bat`:
 ```batch
 @echo off
-python monitoring_agent.py --system-id 1 --server http://192.168.1.100:5000
-pause
+python "C:\path\to\monitoring_agent.py" --system-id 1 --server http://192.168.1.100:5000
 ```
 
-Add to Windows Task Scheduler for automatic startup.
+2. Add to Windows Task Scheduler:
+   - Create new task
+   - Set trigger: "At log on"
+   - Set action: Start program -> select your batch file
+   - Set to run whether user is logged on or not
+
+### Auto-Start on Linux
+
+Add to crontab:
+```bash
+@reboot /usr/bin/python3 /path/to/monitoring_agent.py --system-id 1 --server http://192.168.1.100:5000
+```
+3. Note the ID column for your system
+4. Use that ID when running the agent
+
+### Example Deployment
+
+**Server IP:** `192.168.1.100`
+**System IDs:**
+- PC-LAB-01: ID 1
+- PC-LAB-02: ID 2
+- SERVER-01: ID 3
+
+**On PC-LAB-01:**
+```bash
+python monitoring_agent.py --system-id 1 --server http://192.168.1.100:5000
+```
+
+**On PC-LAB-02:**
+```bash
+python monitoring_agent.py --system-id 2 --server http://192.168.1.100:5000
+```
+
+### Auto-Start on Boot (Windows)
+
+1. Create a batch file `start_monitoring.bat`:
+```batch
+@echo off
+python "C:\path\to\monitoring_agent.py" --system-id 1 --server http://192.168.1.100:5000
+```
+
+2. Add to Windows Task Scheduler:
+   - Create new task
+   - Set trigger: "At log on"
+   - Set action: Start program -> select your batch file
+   - Set to run whether user is logged on or not
+
+### Auto-Start on Linux
+
+Add to crontab:
+```bash
+@reboot /usr/bin/python3 /path/to/monitoring_agent.py --system-id 1 --server http://192.168.1.100:5000
+```
 
 ---
 

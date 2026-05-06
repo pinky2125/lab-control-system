@@ -53,7 +53,19 @@ def systems():
     try:
         conn = sqlite3.connect('lab.db')
         cursor = conn.cursor()
-        data = cursor.execute("SELECT * FROM systems").fetchall()
+        data = cursor.execute(
+            """
+            SELECT id, name, ip_address, mac_address,
+                   CASE
+                     WHEN last_check_time IS NOT NULL
+                       AND (julianday('now') - julianday(last_check_time)) * 86400 > 120
+                     THEN 'Offline'
+                     ELSE status
+                   END AS status,
+                   health_status, last_check_time, cpu_usage, memory_usage, disk_usage, created_at, updated_at
+            FROM systems
+            """
+        ).fetchall()
         conn.close()
         return render_template('systems.html', systems=data, page_title="Systems")
     except Exception as e:
@@ -236,6 +248,7 @@ def update_system():
         id = request.form.get('id')
         name = request.form.get('name', '').strip()
         ip_address = request.form.get('ip_address', '').strip()
+        mac_address = request.form.get('mac_address', '').strip()
         status = request.form.get('status', 'Unknown')
 
         if not id or not name:
@@ -246,8 +259,8 @@ def update_system():
         cursor = conn.cursor()
 
         cursor.execute(
-            """UPDATE systems SET name=?, ip_address=?, status=?, updated_at=? WHERE id=?""",
-            (name, ip_address, status, datetime.now().isoformat(), id)
+            """UPDATE systems SET name=?, ip_address=?, mac_address=?, status=?, updated_at=? WHERE id=?""",
+            (name, ip_address, mac_address, status, datetime.now().isoformat(), id)
         )
 
         conn.commit()
